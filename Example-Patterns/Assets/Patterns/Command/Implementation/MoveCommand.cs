@@ -6,20 +6,26 @@ namespace Patterns.Command.Implementation {
         private readonly Vector3 _initialPosition;
         private readonly Direction _direction;
         private readonly MoveCommandReceiver _receiver;
+        private readonly GameObject _gameObjectToMove;
 
-        public MoveCommand(Vector3 initialPosition, Direction direction) {
+        private Vector3 _lastPosition;
+
+        public MoveCommand(GameObject gameObjectToMove, Vector3 initialPosition, Direction direction) {
             _receiver = new MoveCommandReceiver();
 
+            _gameObjectToMove = gameObjectToMove;
             _initialPosition = initialPosition;
+            _lastPosition = initialPosition;
             _direction = direction;
         }
 
         public override void Execute() {
-            _receiver.MoveOperation(_initialPosition, _direction);
+            var newPos = _receiver.MoveOperation(_gameObjectToMove, _initialPosition, _direction);
+            _lastPosition = newPos;
         }
 
         public override void Undo() {
-            _receiver.MoveOperation(_initialPosition, InverseDirection(_direction));
+            _receiver.MoveOperation(_gameObjectToMove, _lastPosition, InverseDirection(_direction));
         }
 
         private static Direction InverseDirection(Direction direction) {
